@@ -99,6 +99,8 @@ private:
   std::unique_ptr<FactorizedJetCorrector> jecCor_;
   std::vector<JetCorrectorParameters> jetCorPars_;
 
+  edm::ValueMap<float> weights_;
+  edm::EDGetTokenT<edm::ValueMap<float>> input_weights_token_;
   edm::EDGetTokenT<edm::View<reco::Jet>> input_jet_token_;
   edm::EDGetTokenT<reco::VertexCollection> input_vertex_token_;
   edm::EDGetTokenT<edm::ValueMap<StoredPileupJetIdentifier>> input_vm_pujetid_token_;

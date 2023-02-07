@@ -27,7 +27,7 @@ GBRForestsAndConstants::GBRForestsAndConstants(edm::ParameterSet const& iConfig)
       applyJec_(iConfig.getParameter<bool>("applyJec")),
       jec_(iConfig.getParameter<std::string>("jec")),
       residualsFromTxt_(iConfig.getParameter<bool>("residualsFromTxt")),
-      usePuppi_(iConfig.getParameter<bool>("usePuppi")) {
+      usePuppi_(iConfig.getParameter<bool>("usePuppi")){
   if (residualsFromTxt_) {
     residualsTxt_ = iConfig.getParameter<edm::FileInPath>("residualsTxt");
   }
@@ -40,6 +40,9 @@ GBRForestsAndConstants::GBRForestsAndConstants(edm::ParameterSet const& iConfig)
   if (!runMvas_) {
     assert(algos.size() == 1);
   }
+
+
+
 }
 
 // ------------------------------------------------------------------------------------------
@@ -62,6 +65,17 @@ PileupJetIdProducer::PileupJetIdProducer(const edm::ParameterSet& iConfig, GBRFo
       consumes<edm::ValueMap<StoredPileupJetIdentifier>>(iConfig.getParameter<edm::InputTag>("jetids"));
   input_rho_token_ = consumes<double>(iConfig.getParameter<edm::InputTag>("rho"));
   parameters_token_ = esConsumes(edm::ESInputTag("", globalCache->jec()));
+
+
+//  edm::InputTag src_ = iConfig.getParameter<edm::InputTag>("src");
+//  edm::InputTag srcWeights = iConfig.getParameter<edm::InputTag>("srcWeights");
+//  if (iConfig.getParameter<edm::InputTag>("src").label() == iConfig.getParameter<edm::InputTag>("srcConstituentWeights").label())
+//    edm::LogWarning("PileupJetIdAlgo")
+//        << "Particle and weights collection have the same label. You may be applying the same weights twice. \n";
+  edm::InputTag srcConstituentWeights = iConfig.getParameter<edm::InputTag>("srcConstituentWeights");
+  if (!srcConstituentWeights.label().empty()){
+    input_weights_token_ = consumes<edm::ValueMap<float>>(srcConstituentWeights);
+  }
 }
 
 // ------------------------------------------------------------------------------------------
@@ -80,6 +94,12 @@ void PileupJetIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
   iEvent.getByToken(input_jet_token_, jetHandle);
   const View<Jet>& jets = *jetHandle;
 
+  // PUPPI weight Value Map 
+  edm::ValueMap<float> weights_;
+  if (!input_weights_token_.isUninitialized()) {
+    weights_ = iEvent.get(input_weights_token_);
+  }
+  
   // input variables
   Handle<ValueMap<StoredPileupJetIdentifier>> vmap;
   if (!gc->produceJetIds()) {
@@ -167,7 +187,8 @@ void PileupJetIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
     PileupJetIdentifier puIdentifier;
     if (gc->produceJetIds()) {
       // Compute the input variables
-      puIdentifier = ialgo->computeIdVariables(theJet, jec, &(*vtx), *vertexes, rho, gc->usePuppi());
+      ////////////////////////////// added PUPPI weight Value Map
+      puIdentifier = ialgo->computeIdVariables(theJet, jec, &(*vtx), *vertexes, rho, weights_, gc->usePuppi());
       ids.push_back(puIdentifier);
     } else {
       // Or read it from the value map

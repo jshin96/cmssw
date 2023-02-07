@@ -265,6 +265,7 @@ def AddPileUpJetIDVars(proc, jetName="", jetSrc="", jetTableName="", jetTaskName
       vertexes  = "offlineSlimmedPrimaryVertices",
       inputIsCorrected = True,
       applyJec  = False,
+      srcConstituentWeights = "packedPFCandidatespuppi" if "PUPPI" in jetName.upper() else "",
       usePuppi = True if "Puppi" in jetName else False
     )
   )
@@ -277,6 +278,8 @@ def AddPileUpJetIDVars(proc, jetName="", jetSrc="", jetTableName="", jetTaskName
   setattr(proc, puJetIDVar, cms.EDProducer("PileupJetIDVarProducer",
       srcJet = cms.InputTag(jetSrc),
       srcPileupJetId = cms.InputTag(puJetIdVarsCalculator)
+
+
     )
   )
   getattr(proc,jetTaskName).add(getattr(proc, puJetIDVar))

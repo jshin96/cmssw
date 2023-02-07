@@ -22,6 +22,8 @@ _stdalgos    = _chsalgos_106X_UL18
 # Calculate+store variables and run MVAs
 pileupJetId = cms.EDProducer('PileupJetIdProducer',
      produceJetIds = cms.bool(True),
+     src = cms.InputTag(""),
+     srcConstituentWeights = cms.InputTag(""),
      jetids = cms.InputTag(""),
      runMvas = cms.bool(True),
      jets = cms.InputTag("ak4PFJetsCHS"),
