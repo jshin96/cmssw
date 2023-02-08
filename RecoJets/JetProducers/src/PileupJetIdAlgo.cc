@@ -348,10 +348,8 @@ PileupJetIdentifier PileupJetIdAlgo::computeIdVariables(const reco::Jet* jet,
     }
 
     float candPuppiWeight = 1.0;
-    std::cout << "this is where the weights are pulled" << std::endl;
     if (usePuppi){                   // PUPPI Jet weight should be pulled up from valuemap, not packed candidate
       candPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
-      std::cout << "weights are pulled" << std::endl;
     }
 
     float candPt = (icand->pt()) * candPuppiWeight;
@@ -366,20 +364,18 @@ PileupJetIdentifier PileupJetIdAlgo::computeIdVariables(const reco::Jet* jet,
       dRmin = candDr;
 
     // // all particles; PUPPI weights multiplied to leading and subleading constituent if it is for PUPPI
-    if (usePuppi && lLead != nullptr) {
-      LeadcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
-    }
-    if (usePuppi && lSecond != nullptr) {
-      SecondcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
-    }
     if (lLead == nullptr || candPt > (lLead->pt())*LeadcandPuppiWeight) {
       lSecond = lLead;
       SecondcandPuppiWeight = LeadcandPuppiWeight;
       lLead = icand;
-      LeadcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
+      if (usePuppi) {
+        LeadcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
+      }
     } else if ((lSecond == nullptr || candPt > (lSecond->pt())*SecondcandPuppiWeight) && (candPt < (lLead->pt())*LeadcandPuppiWeight)) {
       lSecond = icand;
-      SecondcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
+      if (usePuppi) {
+        SecondcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
+      }
     }
 
     // // average shapes
@@ -401,12 +397,11 @@ PileupJetIdentifier PileupJetIdAlgo::computeIdVariables(const reco::Jet* jet,
 
     // neutrals Neutral hadrons
     if (abs(icand->pdgId()) == 130) {
-      if (usePuppi && lLeadNeut != nullptr) {
-        LeadNeutcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
-      }
       if (lLeadNeut == nullptr || candPt > (lLeadNeut->pt())*LeadNeutcandPuppiWeight) {
         lLeadNeut = icand;
-        LeadNeutcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
+        if (usePuppi) {
+          LeadNeutcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
+        }
       }
         
       internalId_.dRMeanNeut_ += candPtDr;
@@ -421,12 +416,11 @@ PileupJetIdentifier PileupJetIdAlgo::computeIdVariables(const reco::Jet* jet,
     
     // EM candidated photon
     if (icand->pdgId() == 22) {
-      if (usePuppi && lLeadEm != nullptr) {
-        LeadEmcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
-      }
       if (lLeadEm == nullptr || candPt > (lLeadEm->pt())*LeadEmcandPuppiWeight) {
         lLeadEm = icand;
-        LeadEmcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
+        if (usePuppi) {
+          LeadEmcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
+        }
       }
       internalId_.dRMeanEm_ += candPtDr;
       fracEm.push_back(candPtFrac);
@@ -443,13 +437,11 @@ PileupJetIdentifier PileupJetIdAlgo::computeIdVariables(const reco::Jet* jet,
 
     // Charged  particles
     if (icand->charge() != 0) {
-      if (usePuppi && lLeadCh != nullptr) {
-        LeadChcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
-      }
       if (lLeadCh == nullptr || candPt > (lLeadCh->pt())*LeadChcandPuppiWeight) {
         lLeadCh = icand;
-        LeadChcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
-
+        if (usePuppi) {
+          LeadChcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
+        }
         const reco::Track* pfTrk = icand->bestTrack();
         if (lPF && std::abs(icand->pdgId()) == 13 && pfTrk == nullptr) {
           reco::MuonRef lmuRef = lPF->muonRef();
@@ -566,12 +558,11 @@ PileupJetIdentifier PileupJetIdAlgo::computeIdVariables(const reco::Jet* jet,
     }
 
     // trailing candidate
-    if (usePuppi && lTrail != nullptr) {
-      TrailcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
-    }
     if (lTrail == nullptr || candPt < (lTrail->pt())*TrailcandPuppiWeight) {
       lTrail = icand;
-      TrailcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
+      if (usePuppi) {
+        TrailcandPuppiWeight = weights_[jet->sourceCandidatePtr(i)];
+      }
     }
 
     // average for pull variable
