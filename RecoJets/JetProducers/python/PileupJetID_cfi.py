@@ -24,15 +24,15 @@ pileupJetId = cms.EDProducer('PileupJetIdProducer',
      produceJetIds = cms.bool(True),
      jetids = cms.InputTag(""),
      runMvas = cms.bool(True),
-     jets = cms.InputTag("ak4PFJetsCHS"),
+     jets = cms.InputTag("ak4PFJetsPuppi"),
      vertexes = cms.InputTag("offlinePrimaryVertices"),
      algos = cms.VPSet(_stdalgos),
      rho     = cms.InputTag("fixedGridRhoFastjetAll"),
-     jec     = cms.string("AK4PFchs"),
+     jec     = cms.string("AK4PFpuppi"),
      applyJec = cms.bool(True),
      inputIsCorrected = cms.bool(False),
      residualsFromTxt = cms.bool(False),
-     usePuppi = cms.bool(False),
+     srcConstituentWeights = cms.InputTag(""),
 #     residualsTxt     = cms.FileInPath("RecoJets/JetProducers/data/download.url") # must be an existing file
 )
 
