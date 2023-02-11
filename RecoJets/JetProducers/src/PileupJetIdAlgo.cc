@@ -350,7 +350,6 @@ PileupJetIdentifier PileupJetIdAlgo::computeIdVariables(const reco::Jet* jet,
     if (applyConstituentWeight){                   // PUPPI Jet weight should be pulled up from valuemap, not packed candidate
       candWeight = constituentWeights[jet->sourceCandidatePtr(i)];
     }
-
     float candPt = (icand->pt()) * candWeight;
     float candPtFrac = candPt / jetPt;
     float candDr = reco::deltaR(*icand, *jet);
